@@ -148,3 +148,38 @@ This is the canonical engineering history for the Lip-sync Android app and Mobil
 - Establish a GitHub Actions-compatible Google Drive credential/authorization mechanism without committing credentials to source.
 - Upload an APK artifact to the Drive archive and verify size/hash/readback.
 - Only after successful verification, enable archive-then-delete cleanup while retaining the latest five artifacts on GitHub.
+
+
+## 2026-09-26 — alpha03 camera-control and temporal-input iteration
+
+### Implemented
+- Added CameraX Preview use case alongside ImageAnalysis.
+- Added explicit Start lip reading / Stop lip reading controls.
+- CAMERA permission is now requested only after explicit user action.
+- Added visible camera session states: stopped, starting, active and error.
+- Added front/back camera switching; back camera remains the initial mode for pointing the phone at another speaker.
+- Kept microphone permission separate: this visual-only flow does not request microphone access.
+- Added frame-rate-normalized TemporalTensorAssembler for bounded MobileVSR input windows.
+- Temporal tensor assembly rejects over-dense frames, resets on timestamp discontinuity/long capture gaps and maintains a bounded rolling window.
+
+### Optimized
+- Preview and analysis share one lifecycle-bound CameraX session.
+- KEEP_ONLY_LATEST remains enabled to avoid inference backlog.
+- Temporal input is normalized toward 25 FPS rather than blindly accepting every camera callback.
+
+### Validation status
+- Previous repository head through Drive archive policy: CI-VALIDATED.
+- alpha03 camera/temporal changes: CI VALIDATION PENDING for current head.
+- Camera preview and camera switching: NOT YET DEVICE-VALIDATED.
+
+### Known issues
+- ImageAnalysis currently forwards frame metadata only; pixel planes still need safe crop/warp plumbing.
+- Concrete face-landmark provider is not connected yet.
+- Preview UI is functional/minimal, not the final responsive Compose UI.
+
+### Next potential steps
+1. Gate alpha03 on CI.
+2. Add tests for temporal tensor assembly and decoding/confidence.
+3. Connect a concrete face-landmark implementation behind the neutral adapter.
+4. Implement ImageProxy luminance extraction, mouth crop/alignment and 112x112 resize without persisting frames.
+5. Feed stabilized mouth tensors into MobileVSR runtime.
