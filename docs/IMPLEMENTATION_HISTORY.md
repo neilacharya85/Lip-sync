@@ -106,3 +106,23 @@ This is the canonical engineering history for the Lip-sync Android app and Mobil
 #### Validation status
 #### Known issues
 #### Next potential steps
+
+
+## 2026-09-26 — GitHub Actions artifact storage control
+
+### Implemented
+- APK artifacts now use unique run-numbered names.
+- CI cleanup keeps only the latest five non-expired Lip-sync debug APK artifacts.
+- Workflow receives narrowly scoped Actions write permission so it can delete its own obsolete artifacts.
+- APK artifacts also retain the existing five-day expiry as a second storage-control layer.
+
+### Optimized
+- Artifact cleanup is count-based as well as age-based, preventing rapid iterative builds from accumulating many APK ZIPs during the five-day retention window.
+- Source code, Git history and engineering-history Markdown are not part of artifact cleanup.
+
+### Validation status
+- Workflow configuration committed; next push/build validates cleanup execution under GitHub Actions permissions.
+
+### Next potential steps
+- Monitor artifact storage after several successful builds.
+- If release/AAB artifacts are introduced, give them a separate retention policy so production deliverables are not treated as disposable debug APKs.
