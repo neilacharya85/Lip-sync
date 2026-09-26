@@ -14,8 +14,13 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-          cache: gradle
-      - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v4
-      - name: Build
-        run: ./gradlew assembleDebug test
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+      - name: Build and test
+        run: gradle assembleDebug test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lipsync-v0.1-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 5
