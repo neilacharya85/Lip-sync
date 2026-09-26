@@ -183,3 +183,31 @@ This is the canonical engineering history for the Lip-sync Android app and Mobil
 3. Connect a concrete face-landmark implementation behind the neutral adapter.
 4. Implement ImageProxy luminance extraction, mouth crop/alignment and 112x112 resize without persisting frames.
 5. Feed stabilized mouth tensors into MobileVSR runtime.
+
+
+## 2026-09-26 — phase-continuation contracts and alpha03 CI fix
+
+### Fixed
+- CI identified that plain Activity did not satisfy CameraX LifecycleOwner requirements.
+- MainActivity migrated to AndroidX ComponentActivity with the corresponding activity dependency; no synthetic lifecycle implementation is used.
+
+### Implemented
+- Added verified atomic model installation contract: temporary file, byte-size check, SHA-256 verification, then activation.
+- Added audiovisual hypothesis fusion primitive retaining explicit visual/audio evidence flags.
+- Added transcript segment/store contract with timestamps, anonymous speaker ID, confidence, alternatives and deletion operations.
+
+### Validation status
+- alpha03 first attempt: FAILED CI due LifecycleOwner compile error.
+- Lifecycle correction and subsequent phase contracts: CI validation pending.
+- AV fusion and transcript persistence contracts are infrastructure; actual offline ASR and persistent Android store implementations remain pending.
+- Production MobileVSR neural weights remain dependent on the training/distillation pipeline and are not falsely marked complete.
+
+### Next potential steps
+1. Restore green CI.
+2. Implement and test Android pixel-plane mouth crop/alignment path.
+3. Integrate face landmarks behind the provider-neutral adapter.
+4. Implement concrete neural runtime and model packaging.
+5. Add Android transcript persistence/export implementation.
+6. Add optional microphone/ASR implementation and connect AV fusion.
+7. Add contextual Gemma runtime only after evidence path is functional.
+8. Execute device/WER/thermal validation.
