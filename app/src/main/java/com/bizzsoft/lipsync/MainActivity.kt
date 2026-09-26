@@ -1,7 +1,6 @@
 package com.bizzsoft.lipsync
 
 import android.Manifest
-import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Gravity
@@ -9,12 +8,12 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.camera.view.PreviewView
+import androidx.activity.ComponentActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
 import java.util.concurrent.Executors
 
-class MainActivity : Activity(), LifecycleOwner {
+class MainActivity : ComponentActivity() {
     private val cameraExecutor = Executors.newSingleThreadExecutor()
     private lateinit var preview: PreviewView
     private lateinit var status: TextView
