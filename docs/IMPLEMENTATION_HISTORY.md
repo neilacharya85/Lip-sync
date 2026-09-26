@@ -126,3 +126,25 @@ This is the canonical engineering history for the Lip-sync Android app and Mobil
 ### Next potential steps
 - Monitor artifact storage after several successful builds.
 - If release/AAB artifacts are introduced, give them a separate retention policy so production deliverables are not treated as disposable debug APKs.
+
+
+## 2026-09-26 — Build archive policy changed to Google Drive
+
+### Implemented
+- Created a dedicated Google Drive folder: Lip-sync MobileVSR Build Archive.
+- New desired lifecycle: GitHub build -> retain latest five convenient artifacts -> archive older successful APKs to Drive -> verify archived file -> delete corresponding GitHub artifact.
+- Build archive should retain version/build number, commit SHA and build date in its naming/metadata.
+
+### Fixed
+- Disabled the previously added destructive latest-five cleanup because GitHub Actions does not automatically inherit the interactive Google Drive connector authentication.
+- GitHub artifact retention temporarily increased from five to thirty days while verified Drive archival is being established, reducing the risk of losing builds.
+
+### Validation status
+- Drive archive folder: CREATED.
+- GitHub automatic deletion: DISABLED pending archive verification.
+- Fully unattended GitHub-to-Drive archival: NOT YET AUTHENTICATED.
+
+### Next potential steps
+- Establish a GitHub Actions-compatible Google Drive credential/authorization mechanism without committing credentials to source.
+- Upload an APK artifact to the Drive archive and verify size/hash/readback.
+- Only after successful verification, enable archive-then-delete cleanup while retaining the latest five artifacts on GitHub.
