@@ -4,6 +4,11 @@ on:
     branches: [ main, "mobilevsr-**" ]
   pull_request:
     branches: [ main ]
+
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,6 +26,36 @@ jobs:
         run: gradle assembleDebug test
       - uses: actions/upload-artifact@v4
         with:
-          name: lipsync-v0.1-debug-apk
+          name: lipsync-debug-apk-${{ github.run_number }}
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 5
+      - name: Keep only latest 5 APK artifacts
+        if: always() && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          repo=os.environ["REPO"]
+          token=os.environ["GH_TOKEN"]
+          req=urllib.request.Request(
+              f"https://api.github.com/repos/{repo}/actions/artifacts?per_page=100",
+              headers={"Authorization":f"Bearer {token}","Accept":"application/vnd.github+json",
+                       "X-GitHub-Api-Version":"2022-11-28"})
+          with urllib.request.urlopen(req) as r:
+              artifacts=json.load(r)["artifacts"]
+          apks=[a for a in artifacts if a["name"].startswith("lipsync-debug-apk-") and not a["expired"]]
+          apks.sort(key=lambda a:a["created_at"], reverse=True)
+          for artifact in apks[5:]:
+              d=urllib.request.Request(
+                  f"https://api.github.com/repos/{repo}/actions/artifacts/{artifact['id']}",
+                  method="DELETE",
+                  headers={"Authorization":f"Bearer {token}","Accept":"application/vnd.github+json",
+                           "X-GitHub-Api-Version":"2022-11-28"})
+              try:
+                  urllib.request.urlopen(d).read()
+                  print("Deleted old APK artifact", artifact["id"], artifact["name"])
+              except Exception as e:
+                  print("Cleanup warning:", artifact["id"], e)
+          PY
